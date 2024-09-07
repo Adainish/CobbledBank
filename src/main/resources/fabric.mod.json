@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "cobbledbank",
+  "version": "${version}",
+  "name": "CobbledBank",
+  "description": "",
+  "authors": [],
+  "contact": {
+    "repo": "https://github.com/adainish/CobbledBank"
+  },
+  "license": "All-Rights-Reserved",
+  "icon": "assets/cobbledbank/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "nl.iverium.cobbledbank.CobbledBank"
+    ]
+  },
+  "mixins": [
+    "cobbledbank.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
