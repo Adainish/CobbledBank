@@ -13,6 +13,7 @@ import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
 import com.cobblemon.mod.common.api.storage.pc.PCStore;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.google.gson.Gson;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import nl.iverium.cobbledbank.CobbledBank;
@@ -66,6 +67,10 @@ public class PokeBank
         CobbledBank.instance.languageConfig.sendPrefixSuccessFromKey(pps.getPlayerUUID(), "pokebank.addPokemon.success");
         //save the bank
         CobbledBank.instance.database.addPokeBank(this, true);
+        ServerPlayer player = CobbledBank.getServer().getPlayerList().getPlayer(pps.getPlayerUUID());
+        if (player != null)
+            UIManager.openUIForcefully(player, getBankPage(pps.getPlayerUUID(), false));
+        else Logger.log("Player not found. This is bad and shouldn't be happening.");
     }
 
     public void addPokemonFromPC(PCStore pcs, Pokemon pokemon)
@@ -89,9 +94,13 @@ public class PokeBank
         bankPokemon.toStorablePokemon(pokemon);
         pokemonList.add(bankPokemon);
         pcs.remove(pokemon);
-        CobbledBank.instance.languageConfig.sendPrefixSuccessFromKey(pcs.getUuid(), "pokebank.addPokemon.success");
+        CobbledBank.instance.languageConfig.sendPrefixSuccessFromKey(pcs.getUuid(), "pokebank.addpokemon.success");
         //save the bank
         CobbledBank.instance.database.addPokeBank(this, true);
+        ServerPlayer player = CobbledBank.getServer().getPlayerList().getPlayer(pcs.getUuid());
+        if (player != null)
+            UIManager.openUIForcefully(player, getBankPage(pcs.getUuid(), false));
+        else Logger.log("Player not found. This is bad and shouldn't be happening.");
     }
 
     public void removePokemon(PlayerPartyStore pps, BankPokemon bankPokemon)
@@ -101,19 +110,24 @@ public class PokeBank
         {
             //if it is locked, send error message
             CobbledBank.instance.languageConfig.sendPrefixInfoFromKey(pps.getPlayerUUID(), "pokebank.removePokemon.locked");
+            return;
         }
         //check if the pokemon bank is empty
         if (pokemonList.isEmpty())
         {
             //if it is empty, send error message
             CobbledBank.instance.languageConfig.sendPrefixErrorFromKey(pps.getPlayerUUID(), "pokebank.removePokemon.empty");
+            return;
         }
-
         pps.add(bankPokemon.fromStorablePokemon(false));
         pokemonList.remove(bankPokemon);
         CobbledBank.instance.languageConfig.sendPrefixSuccessFromKey(pps.getPlayerUUID(), "pokebank.removePokemon.success");
         //save the bank
         CobbledBank.instance.database.addPokeBank(this, true);
+        ServerPlayer player = CobbledBank.getServer().getPlayerList().getPlayer(pps.getPlayerUUID());
+        if (player != null)
+            UIManager.openUIForcefully(player, getBankPage(pps.getPlayerUUID(), false));
+        else Logger.log("Player not found. This is bad and shouldn't be happening.");
     }
 
     public void clearBank(PlayerPartyStore pps)
@@ -138,6 +152,10 @@ public class PokeBank
         CobbledBank.instance.languageConfig.sendPrefixSuccessFromKey(pps.getPlayerUUID(), "pokebank.clearBank.success");
         //save the bank
         CobbledBank.instance.database.addPokeBank(this, true);
+        ServerPlayer player = CobbledBank.getServer().getPlayerList().getPlayer(pps.getPlayerUUID());
+        if (player != null)
+            UIManager.openUIForcefully(player, getBankPage(pps.getPlayerUUID(), false));
+        else Logger.log("Player not found. This is bad and shouldn't be happening.");
     }
 
     public void movePokemon(PlayerPartyStore pps, PCStore pcs, BankPokemon bankPokemon)
@@ -186,9 +204,8 @@ public class PokeBank
                 .build();
     }
 
-    public Button pcButtonFromPokemon(PCStore pcs, BankPokemon bankPokemon)
+    public Button pcButtonFromPokemon(PCStore pcs, Pokemon pokemon)
     {
-        Pokemon pokemon = bankPokemon.fromStorablePokemon(CobbledBank.instance.database.isGloballyLocked());
         return GooeyButton.builder()
                 .title(CobbledBank.instance.languageConfig.formattedString(Util.prettyPokemonName(pokemon)))
                 .display(Util.pokemonToItemStack(pokemon))
@@ -216,7 +233,7 @@ public class PokeBank
     public List<Button> pcButtons(PCStore pcs)
     {
         List<Button> buttons = new ArrayList<>();
-        for (BankPokemon bankPokemon : pokemonList) buttons.add(pcButtonFromPokemon(pcs, bankPokemon));
+        for (Pokemon pokemon : pcs) buttons.add(pcButtonFromPokemon(pcs, pokemon));
         return buttons;
     }
 

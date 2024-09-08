@@ -330,12 +330,22 @@ public class LanguageConfig
         sendPrefixMessage(uuid, getStringFromKey(key), ChatFormatting.RED);
     }
 
+    public void sendPrefixError(UUID uuid, String message)
+    {
+        sendPrefixMessage(uuid, message, ChatFormatting.RED);
+    }
+
     /**
      * Send a warning message to all players from a key
      * @param key the key to get the message from
      */
     public void sendPrefixWarningFromKey(UUID uuid, String key) {
         sendPrefixMessage(uuid, getStringFromKey(key), ChatFormatting.YELLOW);
+    }
+
+    public void sendPrefixWarning(UUID uuid, String message)
+    {
+        sendPrefixMessage(uuid, message, ChatFormatting.YELLOW);
     }
 
     /**
@@ -346,12 +356,22 @@ public class LanguageConfig
         sendPrefixMessage(uuid, getStringFromKey(key), ChatFormatting.GREEN);
     }
 
+    public void sendPrefixSuccess(UUID uuid, String message)
+    {
+        sendPrefixMessage(uuid, message, ChatFormatting.GREEN);
+    }
+
     /**
      * Send an info message to all players from a key
      * @param key the key to get the message from
      */
     public void sendPrefixInfoFromKey(UUID uuid, String key) {
         sendPrefixMessage(uuid, getStringFromKey(key), ChatFormatting.AQUA);
+    }
+
+    public void sendPrefixInfo(UUID uuid, String message)
+    {
+        sendPrefixMessage(uuid, message, ChatFormatting.AQUA);
     }
 
     /**

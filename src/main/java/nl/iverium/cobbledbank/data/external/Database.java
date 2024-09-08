@@ -92,7 +92,7 @@ public class Database
 
     public boolean unlockGlobalBank() {
         Logger.log("Unlocking the global bank");
-        collection.deleteOne(Filters.eq("global_lock"));
+        collection.deleteOne(Filters.eq("global_lock", true));
         return true;
     }
 
@@ -107,14 +107,11 @@ public class Database
 
     public boolean setKeepHeldItems(boolean keepHeldItems) {
         Logger.log("Setting the keep held items to %keepHeldItems%".replace("%keepHeldItems%", String.valueOf(keepHeldItems)));
-        if (collection.find(Filters.eq("keep_held_items", keepHeldItems)).first() != null) {
-            Logger.log("Keep held items is already set to %keepHeldItems%".replace("%keepHeldItems%", String.valueOf(keepHeldItems)));
-            return false;
-        }
-        if (keepHeldItems) {
-            collection.insertOne(new Document("keep_held_items", true));
+        Document document = collection.find(Filters.exists("keep_held_items")).first();
+        if (document != null) {
+            collection.updateOne(Filters.exists("keep_held_items"), new Document("$set", new Document("keep_held_items", keepHeldItems)));
         } else {
-            collection.deleteOne(Filters.eq("keep_held_items"));
+            collection.insertOne(new Document("keep_held_items", keepHeldItems));
         }
         return true;
     }
@@ -148,7 +145,7 @@ public class Database
     public boolean setMaxBankSize(int size, boolean overwrite) {
         Logger.log("Setting the max bank size to %size%".replace("%size%", String.valueOf(size)));
         //check if bank size is already set
-        if (collection.find(Filters.eq("max_bank_size", size)).first() != null) {
+        if (collection.find(Filters.exists("max_bank_size")).first() != null) {
             if (!overwrite) {
                 try {
                     //check if size is equal to the current size then update the error message
@@ -164,7 +161,7 @@ public class Database
                 }
             } else {
                 Logger.log("Max bank size is already set to %size%, overwriting it".replace("%size%", String.valueOf(size)));
-                collection.replaceOne(Filters.eq("max_bank_size", size), new Document("max_bank_size", size));
+                collection.replaceOne(Filters.exists("max_bank_size"), new Document("max_bank_size", size));
                 return true;
             }
         } else {
@@ -175,7 +172,7 @@ public class Database
     }
 
     public int getMaxBankSize() {
-        Document document = collection.find(Filters.eq("max_bank_size")).first();
+        Document document = collection.find(Filters.exists("max_bank_size")).first();
         if (document == null) {
             Logger.log("Max bank size is not set, returning 0. Please adjust this using the command if this is incorrect");
             return 0;

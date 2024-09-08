@@ -53,7 +53,7 @@ public class BankPokemon
 
     public void toStorablePokemon(Pokemon pokemon)
     {
-        pokemon.clone(true, false).createPokemonProperties(PokemonPropertyExtractor.ALL).copy();
+        this.properties = pokemon.clone(true, false).createPokemonProperties(PokemonPropertyExtractor.ALL).copy();
         this.ivs = new StatStorage();
         this.ivs.convertFromIVs(pokemon.getIvs());
         this.evs = new StatStorage();
@@ -72,10 +72,7 @@ public class BankPokemon
                 pokemon.getIvs().set(stat, ivs.getOrDefault(statId));
         });
         if (locked)
-        {
-            //TODO: apply unbreedable
             pokemon.getPersistentData().putBoolean("breedable", false);
-        }
 
         //check if held item should be retained
         //if it should not be retained, clear the held item, otherwise reapply

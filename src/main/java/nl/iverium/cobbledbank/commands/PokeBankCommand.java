@@ -198,7 +198,8 @@ public class PokeBankCommand {
                                 .executes(cc -> {
                                     int maxPokemon = IntegerArgumentType.getInteger(cc, "maxPokemon");
                                     CobbledBank.instance.database.setMaxBankSize(maxPokemon, false);
-                                    CobbledBank.instance.languageConfig.sendPrefixSuccessFromKey(cc.getSource().getPlayerOrException().getUUID(), "pokebank.setMaxPokemon.success");
+                                    String message = CobbledBank.instance.languageConfig.getStringFromKey("pokebank.setMaxPokemon.success").replace("%s", String.valueOf(maxPokemon));
+                                    CobbledBank.instance.languageConfig.sendPrefixSuccess(cc.getSource().getPlayerOrException().getUUID(), message);
                                     return 1;
                                 })
                                 .then(Commands.literal("overwrite")
@@ -206,7 +207,8 @@ public class PokeBankCommand {
                                         .executes(cc -> {
                                             int maxPokemon = IntegerArgumentType.getInteger(cc, "maxPokemon");
                                             CobbledBank.instance.database.setMaxBankSize(maxPokemon, true);
-                                            CobbledBank.instance.languageConfig.sendPrefixSuccessFromKey(cc.getSource().getPlayerOrException().getUUID(), "pokebank.setMaxPokemon.overwrite.success");
+                                            String message = CobbledBank.instance.languageConfig.getStringFromKey("pokebank.setMaxPokemon.success").replace("%s", String.valueOf(maxPokemon));
+                                            CobbledBank.instance.languageConfig.sendPrefixSuccess(cc.getSource().getPlayerOrException().getUUID(), message);
                                             return 1;
                                         })
 
