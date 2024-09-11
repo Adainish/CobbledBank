@@ -11,6 +11,7 @@ import nl.iverium.cobbledbank.data.adapters.GSON;
 import org.bson.Document;
 
 import java.util.Arrays;
+import java.util.Set;
 
 public class BankPokemon
 {
@@ -18,6 +19,7 @@ public class BankPokemon
     public StatStorage ivs;
     public StatStorage evs;
     public ItemStack heldItem;
+    public Set<String> aspects;
 
     public BankPokemon(PokemonProperties properties, StatStorage ivs, StatStorage evs)
     {
@@ -59,9 +61,10 @@ public class BankPokemon
         this.evs = new StatStorage();
         this.evs.convertFromEVs(pokemon.getEvs());
         this.heldItem = pokemon.heldItem().copy();
+        this.aspects = pokemon.getAspects();
     }
 
-    public Pokemon fromStorablePokemon(boolean locked)
+    public Pokemon fromStorablePokemon()
     {
         Pokemon pokemon = this.properties.create();
         Arrays.stream(Stats.values()).filter(stat -> stat != Stats.ACCURACY && stat != Stats.EVASION).forEachOrdered(stat -> {
@@ -71,9 +74,9 @@ public class BankPokemon
             if (ivs.hasStat(statId))
                 pokemon.getIvs().set(stat, ivs.getOrDefault(statId));
         });
-        if (locked)
-            pokemon.getPersistentData().putBoolean("breedable", false);
 
+        pokemon.getPersistentData().putBoolean("breedable", false);
+        pokemon.setAspects(aspects);
         //check if held item should be retained
         //if it should not be retained, clear the held item, otherwise reapply
         if (CobbledBank.instance.database.shouldKeepHeldItems())

@@ -119,7 +119,7 @@ public class PokeBank
             CobbledBank.instance.languageConfig.sendPrefixErrorFromKey(pps.getPlayerUUID(), "pokebank.removePokemon.empty");
             return;
         }
-        pps.add(bankPokemon.fromStorablePokemon(false));
+        pps.add(bankPokemon.fromStorablePokemon());
         pokemonList.remove(bankPokemon);
         CobbledBank.instance.languageConfig.sendPrefixSuccessFromKey(pps.getPlayerUUID(), "pokebank.removePokemon.success");
         //save the bank
@@ -147,7 +147,7 @@ public class PokeBank
             return;
         }
 
-        pokemonList.forEach(bankPokemon -> pps.add(bankPokemon.fromStorablePokemon(false)));
+        pokemonList.forEach(bankPokemon -> pps.add(bankPokemon.fromStorablePokemon()));
         pokemonList.clear();
         CobbledBank.instance.languageConfig.sendPrefixSuccessFromKey(pps.getPlayerUUID(), "pokebank.clearBank.success");
         //save the bank
@@ -160,8 +160,8 @@ public class PokeBank
 
     public void movePokemon(PlayerPartyStore pps, PCStore pcs, BankPokemon bankPokemon)
     {
-        if (pps != null) addPokemonFromParty(pps, bankPokemon.fromStorablePokemon(false));
-        else if (pcs != null) addPokemonFromPC(pcs, bankPokemon.fromStorablePokemon(false));
+        if (pps != null) addPokemonFromParty(pps, bankPokemon.fromStorablePokemon());
+        else if (pcs != null) addPokemonFromPC(pcs, bankPokemon.fromStorablePokemon());
         pokemonList.remove(bankPokemon);
         CobbledBank.instance.database.addPokeBank(this, true);
     }
@@ -185,22 +185,18 @@ public class PokeBank
                 .title(CobbledBank.instance.languageConfig.formattedString(Util.prettyPokemonName(pokemon)))
                 .display(Util.pokemonToItemStack(pokemon))
                 .lore(CobbledBank.instance.languageConfig.formattedArrayList(Util.loreFromPokemon(pokemon)))
-                .onClick(buttonAction -> {
-                    addPokemon(pps, null, pokemon);
-                })
+                .onClick(buttonAction -> addPokemon(pps, null, pokemon))
                 .build();
     }
 
     public Button bankButtonFromPokemon(PlayerPartyStore pps, BankPokemon bankPokemon)
     {
-        Pokemon pokemon = bankPokemon.fromStorablePokemon(CobbledBank.instance.database.isGloballyLocked());
+        Pokemon pokemon = bankPokemon.fromStorablePokemon();
         return GooeyButton.builder()
                 .title(CobbledBank.instance.languageConfig.formattedString(Util.prettyPokemonName(pokemon)))
                 .display(Util.pokemonToItemStack(pokemon))
                 .lore(CobbledBank.instance.languageConfig.formattedArrayList(Util.loreFromPokemon(pokemon)))
-                .onClick(buttonAction -> {
-                    removePokemon(pps, bankPokemon);
-                })
+                .onClick(buttonAction -> removePokemon(pps, bankPokemon))
                 .build();
     }
 
@@ -210,9 +206,7 @@ public class PokeBank
                 .title(CobbledBank.instance.languageConfig.formattedString(Util.prettyPokemonName(pokemon)))
                 .display(Util.pokemonToItemStack(pokemon))
                 .lore(CobbledBank.instance.languageConfig.formattedArrayList(Util.loreFromPokemon(pokemon)))
-                .onClick(buttonAction -> {
-                    addPokemon(null, pcs, pokemon);
-                })
+                .onClick(buttonAction -> addPokemon(null, pcs, pokemon))
                 .build();
     }
 
@@ -238,7 +232,7 @@ public class PokeBank
     }
 
     public LinkedPage getPartyPage(UUID uuid) {
-        PlayerPartyStore pps = null;
+        PlayerPartyStore pps;
         try {
             pps = Cobblemon.INSTANCE.getStorage().getParty(uuid);
         } catch (NoPokemonStoreException e) {
@@ -249,9 +243,7 @@ public class PokeBank
         GooeyButton.Builder builder = GooeyButton.builder();
         builder.display(new ItemStack(Items.ARROW));
         builder.title(CobbledBank.instance.languageConfig.getFormattedStringFromKey("gui.title.pokebank.back"));
-        builder.onClick(buttonAction -> {
-            UIManager.openUIForcefully(buttonAction.getPlayer(), getBankPage(uuid, false));
-        });
+        builder.onClick(buttonAction -> UIManager.openUIForcefully(buttonAction.getPlayer(), getBankPage(uuid, false)));
         GooeyButton backButton = builder
                 .build();
 
@@ -267,22 +259,18 @@ public class PokeBank
         if (!isParty) secondaryButton = GooeyButton.builder()
                 .display(CobblemonItems.POKE_BALL.getPokeBall().stack(1))
                 .title(CobbledBank.instance.languageConfig.getFormattedStringFromKey("gui.title.pokebank.party"))
-                .onClick(buttonAction -> {
-                    UIManager.openUIForcefully(buttonAction.getPlayer(), getPartyPage(uuid));
-                })
+                .onClick(buttonAction -> UIManager.openUIForcefully(buttonAction.getPlayer(), getPartyPage(uuid)))
                 .build();
         else secondaryButton = GooeyButton.builder()
                 .display(CobblemonItems.PREMIER_BALL.getPokeBall().stack(1))
                 .title(CobbledBank.instance.languageConfig.getFormattedStringFromKey("gui.title.pokebank.pc"))
-                .onClick(buttonAction -> {
-                    UIManager.openUIForcefully(buttonAction.getPlayer(), getPcPage(uuid));
-                })
+                .onClick(buttonAction -> UIManager.openUIForcefully(buttonAction.getPlayer(), getPcPage(uuid)))
                 .build();
         template.set(4, 7, secondaryButton);
     }
 
     public LinkedPage getPcPage(UUID uuid) {
-        PCStore pcs = null;
+        PCStore pcs;
         try {
             pcs = Cobblemon.INSTANCE.getStorage().getPC(uuid);
         } catch (NoPokemonStoreException e) {
@@ -294,9 +282,7 @@ public class PokeBank
         GooeyButton backButton = GooeyButton.builder()
                 .display(new ItemStack(Items.ARROW))
                 .title(CobbledBank.instance.languageConfig.getFormattedStringFromKey("gui.title.pokebank.back"))
-                .onClick(buttonAction -> {
-                    UIManager.openUIForcefully(buttonAction.getPlayer(), getBankPage(uuid, false));
-                })
+                .onClick(buttonAction -> UIManager.openUIForcefully(buttonAction.getPlayer(), getBankPage(uuid, false)))
                 .build();
 
         buttonApplication(uuid, template, backButton, false);
@@ -332,17 +318,13 @@ public class PokeBank
             GooeyButton partyButton = GooeyButton.builder()
                     .display(CobblemonItems.POKE_BALL.getPokeBall().stack(1))
                     .title(CobbledBank.instance.languageConfig.getFormattedStringFromKey("gui.title.pokebank.party"))
-                    .onClick(buttonAction -> {
-                        UIManager.openUIForcefully(buttonAction.getPlayer(), getPartyPage(uuid));
-                    })
+                    .onClick(buttonAction -> UIManager.openUIForcefully(buttonAction.getPlayer(), getPartyPage(uuid)))
                     .build();
 
             GooeyButton pcButton = GooeyButton.builder()
                     .display(CobblemonItems.PREMIER_BALL.getPokeBall().stack(1))
                     .title(CobbledBank.instance.languageConfig.getFormattedStringFromKey("gui.title.pokebank.pc"))
-                    .onClick(buttonAction -> {
-                        UIManager.openUIForcefully(buttonAction.getPlayer(), getPcPage(uuid));
-                    })
+                    .onClick(buttonAction -> UIManager.openUIForcefully(buttonAction.getPlayer(), getPcPage(uuid)))
                     .build();
 
             template.set(4, 1, partyButton);
